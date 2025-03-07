@@ -21,9 +21,9 @@ The dataset used in this project is sourced from a Kaggle competition:
 │   ├── test.csv                 # Test dataset without target labels
 │   └── sample_submission.csv    # Example submission file
 ├── notebooks (Only has a singular notebook for now)
-│   ├── EDA_Notebook.ipynb       # Exploratory Data Analysis and visualization
-│   ├── NLP_Preprocessing.ipynb  # Text cleaning, tokenization, and vectorization scripts
-│   └── Model_Analysis.ipynb     # Model implementation and evaluation (current focus: Multinomial Naive Bayes)
+│   ├── eda_approach_2.ipynb       # Exploratory Data Analysis and visualization
+│   ├── NLP_Preprocessing-and-Model-Analysis.ipynb  # Text cleaning, tokenization, and vectorization scripts and pipelined models for analysis
+│   └── Multiple_Model_Analysis.ipynb     # Not yet implemented will contain new model analysis methods on differently prepared data
 ├── reports                      # Contains the PDF Reports of the project
 │   ├── CSC-4260-NLP Tweets-Initial-Report.pdf       # Initial report
 ├── README.md                    # Project documentation
@@ -47,13 +47,18 @@ The dataset used in this project is sourced from a Kaggle competition:
 
    ```
 
-3. **Install Required Packages:** (not yet implemented)
+3. **Install Required Packages:**
 
+   ```bash
+   pip install pandas numpy matplotlib seaborn nltk scikit-learn spacy pyldavis wordcloud
+   ```
+
+   Or use requirements.txt (not yet implemented)
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Notebooks:**  
+4. **Notebooks:**  (Not yet needed)
    For interactive exploration and further analysis, open the Jupyter notebooks located in the `notebooks` directory.
 
 ## Results
@@ -63,6 +68,8 @@ The baseline Multinomial Naive Bayes model currently implemented shows the follo
 - **Mean Precision:** 0.8805
 - **Mean Recall:** 0.6037
 - **Mean F1 Score:** 0.7159
+
+- 
 
 These results indicate that while the model is highly precise, it misses some disaster-related tweets (lower recall). Future iterations will focus on improving recall by incorporating and comparing additional models.
 
