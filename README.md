@@ -126,4 +126,4 @@ Simply open the Jupyter notebooks in the root directory and run all the cells to
 
 ## Acknowledgements
 
-This project was developed as part of the CSC-4260/5260 course.
+This project was developed as part of the CSC-4260 course.
