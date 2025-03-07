@@ -12,13 +12,13 @@ This repository contains the code, data preprocessing scripts, and model impleme
 - Tania Flores
 
 ### Notebook Contributions
-Visualizations: Sharon Colson, Tania Perdomo Flores, Thomas Robertson, Caleb Smith
-Data Preprocessing: Sharon Colson, Tania Perdomo Flores, Thomas Robertson, Caleb Smith
-Model Selection: Sharon Colson, Tania Perdomo Flores, Thomas Robertson, Caleb Smith
-Modeling: Thomas Robertson, Caleb Smith
-Model Tuning: Thomas Robertson, Caleb Smith
-Model Evaluation: Thomas Robertson
-Model Comparison: Thomas Robertson
+- Visualizations: Sharon Colson, Tania Perdomo Flores, Thomas Robertson, Caleb Smith  
+- Data Preprocessing: Sharon Colson, Tania Perdomo Flores, Thomas Robertson, Caleb Smith  
+- Model Selection: Sharon Colson, Tania Perdomo Flores, Thomas Robertson, Caleb Smith
+- Modeling: Thomas Robertson, Caleb Smith
+- Model Tuning: Thomas Robertson, Caleb Smith
+- Model Evaluation: Thomas Robertson
+- Model Comparison: Thomas Robertson
 
 ### Report Contributions
 All team members contributed to the report by providing content, reviewing, and editing sections.
