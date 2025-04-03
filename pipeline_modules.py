@@ -1,7 +1,13 @@
-import os
-import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+import os
+import pandas as pd
+import seaborn as sns
+
+from matplotlib import cm  # for colormap
+from matplotlib.colors import to_hex
+from matplotlib.colors import ListedColormap
+
 from sklearn.metrics import (
     roc_auc_score, roc_curve, confusion_matrix, ConfusionMatrixDisplay
 )
@@ -74,6 +80,12 @@ pipelines = {
 }
 
 def plot_learning_curve(estimator, title, X, y, cv, scoring='accuracy', n_jobs=-1, save_path=None):
+
+    # Use viridis colormap to get consistent, soft shades
+    viridis = cm.get_cmap('viridis')
+    train_color = to_hex(viridis(0.25))  # bluish-teal
+    test_color = to_hex(viridis(0.65))   # greenish
+
     train_sizes, train_scores, test_scores = learning_curve(
         estimator, X, y, cv=cv, scoring=scoring, n_jobs=n_jobs, train_sizes=np.linspace(0.1, 1.0, 10)
     )
@@ -82,17 +94,21 @@ def plot_learning_curve(estimator, title, X, y, cv, scoring='accuracy', n_jobs=-
     test_scores_mean = np.mean(test_scores, axis=1)
     test_scores_std = np.std(test_scores, axis=1)
 
-    plt.figure()
+    plt.figure(facecolor='white')
     plt.title(title)
     plt.xlabel("Training Examples")
     plt.ylabel(scoring.capitalize())
-    plt.grid()
+    plt.grid(alpha=0.3)
+
+    # Soft shading
     plt.fill_between(train_sizes, train_scores_mean - train_scores_std,
-                     train_scores_mean + train_scores_std, alpha=0.1, color="r")
+                     train_scores_mean + train_scores_std, alpha=0.2, color=train_color)
     plt.fill_between(train_sizes, test_scores_mean - test_scores_std,
-                     test_scores_mean + test_scores_std, alpha=0.1, color="g")
-    plt.plot(train_sizes, train_scores_mean, 'o-', color="r", label="Training score")
-    plt.plot(train_sizes, test_scores_mean, 'o-', color="g", label="CV score")
+                     test_scores_mean + test_scores_std, alpha=0.2, color=test_color)
+
+    plt.plot(train_sizes, train_scores_mean, 'o-', color=train_color, label="Training Score")
+    plt.plot(train_sizes, test_scores_mean, 'o-', color=test_color, label="Validation Score")
+
     plt.legend(loc="best")
     plt.tight_layout()
 
@@ -103,8 +119,13 @@ def plot_learning_curve(estimator, title, X, y, cv, scoring='accuracy', n_jobs=-
         plt.show()
 
 def evaluate_models(xy_datasets, pipelines, cv_folds=5, random_state=42, output_dir="performance_metrics"):
+    
     results = []
 
+    viridis = cm.get_cmap('viridis', 256)
+    viridis_light = ListedColormap(viridis(np.linspace(0.2, 0.8)))  # focus on mid-range
+
+    
     for dataset_name, (X, y) in xy_datasets.items():
         print(f"\n📦 Dataset: {dataset_name} ({len(X)} samples)")
 
@@ -147,11 +168,13 @@ def evaluate_models(xy_datasets, pipelines, cv_folds=5, random_state=42, output_
                 'ROC AUC': roc
             })
 
+            # ROC Curve
             if y_scores is not None:
                 fpr, tpr, _ = roc_curve(y_test, y_scores)
                 plt.figure()
-                plt.plot(fpr, tpr, label=f'{model_name} (AUC = {roc:.2f})')
-                plt.plot([0, 1], [0, 1], 'k--')
+                plt.plot(fpr, tpr, label=f'{model_name} (AUC = {roc:.2f})', color=to_hex(viridis(0.6)))
+                plt.plot([0, 1], [0, 1], 'k--', alpha=0.4)
+                plt.grid(alpha=0.3)
                 plt.xlabel('False Positive Rate')
                 plt.ylabel('True Positive Rate')
                 plt.title(f'ROC Curve — {model_name} on {dataset_name}')
@@ -160,14 +183,31 @@ def evaluate_models(xy_datasets, pipelines, cv_folds=5, random_state=42, output_
                 plt.savefig(os.path.join(save_dir, "roc_curve.png"))
                 plt.close()
 
-            cm = confusion_matrix(y_test, y_pred)
-            disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=pipeline.classes_)
-            disp.plot(cmap='Blues')
+            # Confusion Matrix
+            cmatrix = confusion_matrix(y_test, y_pred)
+            plt.figure(figsize=(6, 5))
+            sns.heatmap(
+                cmatrix,
+                annot=True,
+                fmt='d',
+                # cmap=sns.light_palette("seagreen", as_cmap=True),
+                cmap=viridis_light,
+                cbar=False,
+                linewidths=0.5,
+                linecolor='white',
+                square=True,
+                annot_kws={"size": 12},
+                xticklabels=pipeline.classes_,
+                yticklabels=pipeline.classes_
+            )
             plt.title(f'Confusion Matrix — {model_name} on {dataset_name}')
+            plt.xlabel("Predicted")
+            plt.ylabel("Actual")
             plt.tight_layout()
             plt.savefig(os.path.join(save_dir, "confusion_matrix.png"))
             plt.close()
 
+            # Learning Curve
             print(f"📈 Plotting learning curve for {model_name} on {dataset_name}...")
             plot_learning_curve(
                 pipeline,
@@ -178,5 +218,11 @@ def evaluate_models(xy_datasets, pipelines, cv_folds=5, random_state=42, output_
                 save_path=os.path.join(save_dir, "learning_curve.png")
             )
 
+    # Sort by F1 Score in descending order
     results_df = pd.DataFrame(results).sort_values(by="F1 Score", ascending=False).reset_index(drop=True)
-    return results_df
+
+    styled = results_df.style.highlight_max(axis=0, color='green').set_table_styles([
+        {'selector': 'th', 'props': [('font-size', '14px'), ('color', 'black'), ('background-color', 'white')]}
+    ])
+
+    return styled
