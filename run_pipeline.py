@@ -1,3 +1,4 @@
+# Author: Sharon Colson
 import sys
 from pipeline_modules import load_xy_datasets, pipelines,  evaluate_models
 
