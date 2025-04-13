@@ -118,7 +118,7 @@ def plot_learning_curve(estimator, title, X, y, cv, scoring='accuracy', n_jobs=-
     else:
         plt.show()
 
-def evaluate_models(xy_datasets, pipelines, cv_folds=5, random_state=42, output_dir="performance_metrics"):
+def evaluate_models(xy_datasets, pipelines, cv_folds=5, random_state=42, output_dir="performance_metrics3"):
     
     results = []
 
@@ -221,8 +221,4 @@ def evaluate_models(xy_datasets, pipelines, cv_folds=5, random_state=42, output_
     # Sort by F1 Score in descending order
     results_df = pd.DataFrame(results).sort_values(by="F1 Score", ascending=False).reset_index(drop=True)
 
-    styled = results_df.style.highlight_max(axis=0, color='green').set_table_styles([
-        {'selector': 'th', 'props': [('font-size', '14px'), ('color', 'black'), ('background-color', 'white')]}
-    ])
-
-    return styled
+    return results_df

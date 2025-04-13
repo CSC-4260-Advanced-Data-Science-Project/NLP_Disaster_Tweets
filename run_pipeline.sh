@@ -1,13 +1,15 @@
 #!/bin/bash
 #SBATCH --account=hpcadmins
-#SBATCH --partition=batch-warp  
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=96
-#SBATCH --time=4:00:00
+#SBATCH --partition=batch-impulse  
+#SBATCH --cpus-per-task=28
+#SBATCH --mem=16G
+#SBATCH --time=04:00:00
 #SBATCH --array=0-26
 
 # Load your environment
-spack load py-matplotlib@3.8 py-pandas py-seaborn py-scikit-learn 
+. /opt/ohpc/pub/spack/v0.21.1/share/spack/setup-env.sh
+spack load py-matplotlib@3.7 py-scikit-learn@1.3.2  py-seaborn@0.12.2
+
 # source ../tweet_env/bin/activate
 
 # Read the dataset name from the array index
