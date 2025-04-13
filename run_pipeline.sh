@@ -4,7 +4,7 @@
 #SBATCH --cpus-per-task=28
 #SBATCH --mem=16G
 #SBATCH --time=04:00:00
-#SBATCH --array=0-26
+#SBATCH --array=0-29
 
 # Load your environment
 . /opt/ohpc/pub/spack/v0.21.1/share/spack/setup-env.sh
