@@ -134,7 +134,7 @@ def run_grid_searches(X_train, y_train, pipelines):
             n_jobs=-1,
             verbose=1
         )
-        
+
         grid.fit(X_train, y_train)
         best_models[model_name] = grid
 
@@ -143,24 +143,24 @@ def run_grid_searches(X_train, y_train, pipelines):
 
     return best_models
 
-# 🔍 Run just on one dataset and two models
-xy_datasets = load_xy_datasets("final_processed")
-xy_datasets = {'prepended_v3_lemmatized': xy_datasets['prepended_v3_lemmatized']}  # pick one
+# # 🔍 Run just on one dataset and two models
+# xy_datasets = load_xy_datasets("final_processed")
+# xy_datasets = {'prepended_v3_lemmatized': xy_datasets['prepended_v3_lemmatized']}  # pick one
 
-# Select and split dataset for hypertuning
-X, y = xy_datasets['prepended_v3_lemmatized']
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, stratify=y, random_state=42
-)
+# # Select and split dataset for hypertuning
+# X, y = xy_datasets['prepended_v3_lemmatized']
+# X_train, X_test, y_train, y_test = train_test_split(
+#     X, y, test_size=0.2, stratify=y, random_state=42
+# )
 
-# Run the hypertuning function
-best_models = run_grid_searches(X_train, y_train, pipelines)
+# # Run the hypertuning function
+# best_models = run_grid_searches(X_train, y_train, pipelines)
 
-# Evaluate best models on test set
-for name, model in best_models.items():
-    print(f"\n📊 Evaluation Report for {name}")
-    y_pred = model.predict(X_test)
-    print(classification_report(y_test, y_pred))
+# # Evaluate best models on test set
+# for name, model in best_models.items():
+#     print(f"\n📊 Evaluation Report for {name}")
+#     y_pred = model.predict(X_test)
+#     print(classification_report(y_test, y_pred))
 
 
 def plot_learning_curve(estimator, title, X, y, cv, scoring='accuracy', n_jobs=-1, save_path=None):
