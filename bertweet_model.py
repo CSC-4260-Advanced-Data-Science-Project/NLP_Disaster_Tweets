@@ -8,7 +8,7 @@ Original file is located at
 """
 
 # !pip install transformers datasets scikit-learn torch
-# !pip install huggingface_hub[hf_xet]
+# !pip install huggingface_hub[hf_xet] # I'm not entirely sure if this pip install is needed or not
 
 import pandas as pd
 import numpy as np
@@ -18,147 +18,134 @@ import torch
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
 from sklearn import metrics
-from transformers import TrainingArguments, Trainer, AutoModel, AutoTokenizer
+from transformers import TrainingArguments, Trainer, AutoModelForSequenceClassification, AutoTokenizer
 
 # Load dataframe
-# IMPORTANT: Make sure to put data file in the correct place!
-# IMPORTANT: Modify this notebook to loop through all datasets and implement cross-validation!
-# IMPORTANT: Should we look into hyperparameter tuning?
-df = pd.read_csv("Data/prepended_v3_lemmatized.csv")
+df = pd.read_csv("final_processed/prepended_v3_lemmatized.csv")
 df.drop(columns=['text', 'text_length', 'length'], inplace=True)
-df.rename(columns={'processed_text':'text', 'target':'label'}, inplace=True)
+df.rename(columns={'processed_text': 'text', 'target': 'label'}, inplace=True)
 df = df[["text", "label"]].copy()  # Drop other columns if they exist
-df["text"] = df["text"].astype(str)       # Force all entries to be strings
-# df
+df["text"] = df["text"].astype(str)  # Force all entries to be strings
+# df["text"] = df["text"].lower() # How do we do this the right way?
+print(df.loc[0, "text"])
 
 dataset = Dataset.from_pandas(df)
 
-# dataset
 
-# print(dataset.column_names)
+def compute_roc_auc(trainer, dataset):
+    output = trainer.predict(dataset)
+    probs = torch.nn.functional.softmax(torch.tensor(output.predictions), dim=-1)[:, 1].numpy()
+    auc = metrics.roc_auc_score(output.label_ids, probs)
+    return auc
 
-# print(dataset[0])
-
-# print(type(dataset[0]["text"]))
-
-# df.dtypes
-
-# dataset = dataset.map(tokenize_function, batched=True)
-# dataset = dataset.rename_column("label", "labels")
-# dataset.set_format("torch", columns=["input_ids", "attention_mask", "labels"])
 
 tokenizer = AutoTokenizer.from_pretrained("vinai/bertweet-base", use_fast=False)
+
 
 def tokenize_function(example):
     return tokenizer(example["text"], truncation=True, padding="max_length", max_length=128)
 
-# dataset = dataset.map(tokenize_function, batched=True)
-# dataset = dataset.rename_column("label", "labels")
-# dataset.set_format("torch", columns=["input_ids", "attention_mask", "labels"])
-
-# dataset
-
-# IMPORTANT: It may make sense to implement cross-validation here!
-# IMPORANT: Make sure you commented out certain code!!!
 
 n = 5
 kf = KFold(n_splits=n, shuffle=True, random_state=42)
 
-acc_array_tr = [] # 'tr' is short for 'train'
+acc_array_tr = []  # 'tr' is short for 'train'
 f1_array_tr = []
 precision_array_tr = []
 recall_array_tr = []
-roc_auc_tr = []
+auc_array_tr = []
 
 acc_array_val = []
 f1_array_val = []
 precision_array_val = []
 recall_array_val = []
-roc_auc_val = []
-# roc_auc_array = [] # Maybe implement this later
+auc_array_val = []
 
 for train_index, val_index in kf.split(dataset):
-  train = dataset[train_index]
-  val = dataset[val_index]
+    train = dataset[train_index]
+    val = dataset[val_index]
 
-  train = Dataset.from_dict(train)
-  val = Dataset.from_dict(val)
+    train = Dataset.from_dict(train)
+    val = Dataset.from_dict(val)
 
-  print(train)
-  print(val)
+    print(train)
+    print(val)
 
-  # IMPORTANT: Is this the right place to put this?
-  train = train.map(tokenize_function, batched=True)
-  train = train.rename_column("label", "labels")
-  train.set_format("torch", columns=["input_ids", "attention_mask", "labels"])
+    train = train.map(tokenize_function, batched=True)
+    train = train.rename_column("label", "labels")
+    train.set_format("torch", columns=["input_ids", "attention_mask", "labels"])
 
-  # IMPORTANT: Is this the right place to put this?
-  val = val.map(tokenize_function, batched=True)
-  val = val.rename_column("label", "labels")
-  val.set_format("torch", columns=["input_ids", "attention_mask", "labels"])
+    val = val.map(tokenize_function, batched=True)
+    val = val.rename_column("label", "labels")
+    val.set_format("torch", columns=["input_ids", "attention_mask", "labels"])
 
-  print(train)
-  print(val)
+    print(train)
+    print(val)
+    print(val['labels'])
 
-  model = AutoModel.from_pretrained("vinai/bertweet-base")
+    model = AutoModelForSequenceClassification.from_pretrained("vinai/bertweet-base", num_labels=2)
 
-  training_args = TrainingArguments (
-    output_dir="./results",
-    evaluation_strategy="epoch",
-    save_strategy="epoch",  # Add this!
-    logging_strategy="epoch",
-    learning_rate=2e-5,
-    per_device_train_batch_size=8,
-    per_device_eval_batch_size=8,
-    num_train_epochs=3,
-    weight_decay=0.01,
-    save_total_limit=1,
-    load_best_model_at_end=True,
-  )
+    training_args = TrainingArguments(
+        output_dir="./results",
+        eval_strategy="epoch",
+        save_strategy="epoch",
+        logging_strategy="epoch",
+        report_to="none",
+        learning_rate=2e-5,
+        per_device_train_batch_size=8,
+        per_device_eval_batch_size=8,
+        num_train_epochs=3,
+        weight_decay=0.01,
+        save_total_limit=1,
+        load_best_model_at_end=True,
+    )
 
-  trainer = Trainer (
-    model=model,
-    args=training_args,
-    train_dataset=train,
-    eval_dataset=val,
-    tokenizer=tokenizer,
-  )
+    trainer = Trainer(
+        model=model,
+        args=training_args,
+        train_dataset=train,
+        eval_dataset=val,
+        tokenizer=tokenizer,
+    )
 
-  trainer.train()
-  trainer.evaluate()
+    trainer.train()
+    trainer.evaluate()
 
-  # Predict on training data
-  train_output = trainer.predict(train)
-  train_preds = np.argmax(train_output.predictions, axis=1)  # Convert logits to predicted class
+    # Predict on training data
+    train_output = trainer.predict(train)
+    train_preds = np.argmax(train_output.predictions, axis=1)  # Convert logits to predicted class
 
-  # Predict on test data
-  val_output = trainer.predict(val)
-  val_preds = np.argmax(val_output.predictions, axis=1)
+    # Predict on test data
+    val_output = trainer.predict(val)
+    val_preds = np.argmax(val_output.predictions, axis=1)
 
-  # (Optional) True labels
-  train_labels = train_output.label_ids
-  val_labels = val_output.label_ids
+    # True labels
+    train_labels = train_output.label_ids
+    val_labels = val_output.label_ids
 
-  accuracy_tr = metrics.accuracy_score(train_labels, train_preds)
-  f1_tr = metrics.f1_score(train_labels, train_preds)
-  precision_tr = metrics.precision_score(train_labels, train_preds)
-  recall_tr = metrics.recall_score(train_labels, train_preds)
+    accuracy_tr = metrics.accuracy_score(train_labels, train_preds)
+    f1_tr = metrics.f1_score(train_labels, train_preds)
+    precision_tr = metrics.precision_score(train_labels, train_preds)
+    recall_tr = metrics.recall_score(train_labels, train_preds)
+    roc_auc_tr = compute_roc_auc(trainer, train)
 
-  accuracy_val = metrics.accuracy_score(val_labels, val_preds)
-  f1_val = metrics.f1_score(val_labels, val_preds)
-  precision_val = metrics.precision_score(val_labels, val_preds)
-  recall_val = metrics.recall_score(val_labels, val_preds)
-  # roc_auc = metrics.roc_auc_score(val_labels, val_preds) # Probably not correct
+    accuracy_val = metrics.accuracy_score(val_labels, val_preds)
+    f1_val = metrics.f1_score(val_labels, val_preds)
+    precision_val = metrics.precision_score(val_labels, val_preds)
+    recall_val = metrics.recall_score(val_labels, val_preds)
+    roc_auc_val = compute_roc_auc(trainer, val)
 
-  acc_array_tr.append(accuracy_tr)
-  f1_array_tr.append(f1_tr)
-  precision_array_tr.append(precision_tr)
-  recall_array_tr.append(recall_tr)
+    acc_array_tr.append(accuracy_tr)
+    f1_array_tr.append(f1_tr)
+    precision_array_tr.append(precision_tr)
+    recall_array_tr.append(recall_tr)
+    auc_array_tr.append(roc_auc_tr)
 
-  acc_array_val.append(accuracy_val)
-  f1_array_val.append(f1_val)
-  precision_array_val.append(precision_val)
-  recall_array_val.append(recall_val)
+    acc_array_val.append(accuracy_val)
+    f1_array_val.append(f1_val)
+    precision_array_val.append(precision_val)
+    recall_array_val.append(recall_val)
+    auc_array_val.append(roc_auc_val)
 
 print("Training Accuracy Array: ")
 print(acc_array_tr)
@@ -168,6 +155,8 @@ print("Training Precision Array: ")
 print(precision_array_tr)
 print("Training Recall Array: ")
 print(recall_array_tr)
+print("Training ROC_AUC Array: ")
+print(auc_array_tr)
 
 print("Training Accuracy mean: ")
 print(np.mean(acc_array_tr))
@@ -177,6 +166,8 @@ print("Training Precision mean: ")
 print(np.mean(precision_array_tr))
 print("Training Recall mean: ")
 print(np.mean(recall_array_tr))
+print("Training ROC_AUC mean: ")
+print(np.mean(auc_array_tr))
 
 print("Validation Accuracy Array: ")
 print(acc_array_val)
@@ -186,6 +177,8 @@ print("Validation Precision Array: ")
 print(precision_array_val)
 print("Validation Recall Array: ")
 print(recall_array_val)
+print("Validation ROC_AUC Array: ")
+print(auc_array_val)
 
 print("Validation Accuracy mean: ")
 print(np.mean(acc_array_val))
@@ -195,91 +188,5 @@ print("Validation Precision mean: ")
 print(np.mean(precision_array_val))
 print("Validation Recall mean: ")
 print(np.mean(recall_array_val))
-
-# dataset = dataset.train_test_split(test_size=0.2, seed=42)
-# train_dataset = dataset["train"]
-# eval_dataset = dataset["test"]
-
-# IMPORTANT: It may make sense to implement cross-validation here!
-
-# model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
-
-# training_args = TrainingArguments(
-#     output_dir="./results",
-#     evaluation_strategy="epoch",
-#     save_strategy="epoch",  # Add this!
-#     logging_strategy="epoch",
-#     learning_rate=2e-5,
-#     per_device_train_batch_size=8,
-#     per_device_eval_batch_size=8,
-#     num_train_epochs=3,
-#     weight_decay=0.01,
-#     save_total_limit=1,
-#     load_best_model_at_end=True,
-# )
-
-# trainer = Trainer(
-#     model=model,
-#     args=training_args,
-#     train_dataset=train,
-#     eval_dataset=val,
-#     tokenizer=tokenizer,
-# )
-
-# kf = KFold(n_splits=5, shuffle=True, random_state=42)
-# scores = cross_val_score(trainer, ...)
-
-# trainer.train()
-
-# trainer.evaluate()
-
-# Predict on new data
-# text = "The plot was really boring."
-# inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True, max_length=128)
-# inputs = {k: v.to(model.device) for k, v in inputs.items()}
-# outputs = model(**inputs)
-# pred = torch.argmax(outputs.logits, dim=1).item()
-# print("Prediction:", pred)
-
-# with torch.no_grad():
-#     logits = model(**inputs).logits
-
-# predicted_class_ids = torch.arange(0, logits.shape[-1])[torch.sigmoid(logits).squeeze(dim=0) > 0.5]
-
-# train_dataset
-
-# test_dataset = eval_dataset
-
-# test_dataset
-
-# IMPORTANT: Don't forget to implement cross-validation!
-
-# IMPORTANT: Is all of the data available in the prepended_v3_lemmatized.csv dataset?
-
-# import numpy as np
-
-# # Predict on training data
-# train_output = trainer.predict(train_dataset)
-# train_preds = np.argmax(train_output.predictions, axis=1)  # Convert logits to predicted class
-
-# # Predict on test data
-# test_output = trainer.predict(test_dataset)
-# test_preds = np.argmax(test_output.predictions, axis=1)
-
-# # (Optional) True labels
-# train_labels = train_output.label_ids
-# test_labels = test_output.label_ids
-
-# test_labels
-
-# test_preds
-
-# metrics.accuracy_score(test_labels, test_preds)
-
-# metrics.f1_score(test_labels, test_preds)
-
-# IMPORTANT: Look into hyperparameter tuning! (Look at Dr. Roberts' slides and online?)
-
-# IMPORTANT: Integrate this model into the main pipeline!
-
-# IMPORANT: Commit your code!!!
+print("Validation ROC_AUC mean: ")
+print(np.mean(auc_array_val))
