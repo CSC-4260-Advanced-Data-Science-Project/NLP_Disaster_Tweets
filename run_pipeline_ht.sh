@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --account=hpcadmins
-#SBATCH --partition=batch-impulse  
+#SBATCH --partition=batch-impulse
 #SBATCH --cpus-per-task=28
 #SBATCH --mem=16G
 #SBATCH --time=04:00:00

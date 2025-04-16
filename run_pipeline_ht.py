@@ -1,6 +1,6 @@
 # Author: Thomas D. Robertson II
 import sys
-from pipeline_modules_ht import load_xy_datasets, evaluate_models, run_grid_searches
+from pipeline_modules_ht import load_xy_datasets, evaluate_models, run_grid_searches, pipelines
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 import pandas as pd
@@ -33,4 +33,4 @@ for name, model in best_models.items():
 results_df = evaluate_models(xy_subset, best_models)
 
 # Save raw results to CSV
-results_df.to_csv(f"performance_metrics3/{dataset_name}_results.csv", index=False)
+results_df.to_csv(f"performance_metrics4/{dataset_name}_results.csv", index=False)

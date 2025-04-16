@@ -200,7 +200,7 @@ def plot_learning_curve(estimator, title, X, y, cv, scoring='accuracy', n_jobs=-
         plt.show()
 
 
-def evaluate_models(xy_datasets, best_models, cv_folds=5, random_state=42, output_dir="performance_metrics"):
+def evaluate_models(xy_datasets, best_models, cv_folds=5, random_state=42, output_dir="performance_metrics4"):
     results = []
     viridis = cm.get_cmap('viridis', 256)
     viridis_light = ListedColormap(viridis(np.linspace(0.2, 0.8)))

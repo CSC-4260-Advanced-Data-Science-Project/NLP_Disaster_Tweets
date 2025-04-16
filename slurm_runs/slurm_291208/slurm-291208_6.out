@@ -1,0 +1,11 @@
+🧠 Running BERT on dropped_v7_lowercase_words_only
+🚀 Starting BERT CV for dropped_v7_lowercase_words_only...
+Traceback (most recent call last):
+  File "/work/projects/hpcadmins/sw-slcolson/NLP_Disaster_Tweets/run_bert_cv.py", line 109, in <module>
+    run_bert_pipeline(dataset_name)
+  File "/work/projects/hpcadmins/sw-slcolson/NLP_Disaster_Tweets/run_bert_cv.py", line 23, in run_bert_pipeline
+    tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+  File "/work/projects/hpcadmins/sw-slcolson/tweet_env/lib/python3.10/site-packages/transformers/tokenization_utils_base.py", line 2046, in from_pretrained
+    raise EnvironmentError(
+OSError: Can't load tokenizer for 'bert-base-uncased'. If you were trying to load it from 'https://huggingface.co/models', make sure you don't have a local directory with the same name. Otherwise, make sure 'bert-base-uncased' is the correct path to a directory containing all relevant files for a BertTokenizer tokenizer.
+✅ Completed dropped_v7_lowercase_words_only in 59 seconds

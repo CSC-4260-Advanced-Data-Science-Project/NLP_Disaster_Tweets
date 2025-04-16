@@ -1,0 +1,44 @@
+Processing dataset: kept_v7_lowercase_words_only
+
+📥 Loaded 30 datasets.
+
+⚠️ Datasets with NaNs (before cleaning):
+ - kept_v3_lemmatized: 1 NaNs removed
+ - dropped_v7_lowercase_words_only: 1 NaNs removed
+ - dropped_v4_stemmed: 1 NaNs removed
+ - dropped_v6_custom_stopwords: 5 NaNs removed
+ - prepended_v6_custom_stopwords: 1 NaNs removed
+ - prepended_v5_lemma_stem: 1 NaNs removed
+ - kept_v6_custom_stopwords: 5 NaNs removed
+ - prepended_v9_minimal_processing: 1 NaNs removed
+ - kept_v8_keep_hashtags: 1 NaNs removed
+ - prepended_v8_keep_hashtags: 1 NaNs removed
+ - kept_v7_lowercase_words_only: 1 NaNs removed
+ - kept_v1_basic_clean: 1 NaNs removed
+ - kept_v2_no_emojis_mentions: 1 NaNs removed
+ - prepended_v10_lemma_stem_custom_stopwords: 1 NaNs removed
+ - kept_v5_lemma_stem: 1 NaNs removed
+ - prepended_v3_lemmatized: 1 NaNs removed
+ - dropped_v10_lemma_stem_custom_stopwords: 1 NaNs removed
+ - prepended_v2_no_emojis_mentions: 1 NaNs removed
+ - dropped_v1_basic_clean: 1 NaNs removed
+ - kept_v4_stemmed: 1 NaNs removed
+ - dropped_v3_lemmatized: 1 NaNs removed
+ - dropped_v2_no_emojis_mentions: 1 NaNs removed
+ - kept_v9_minimal_processing: 6 NaNs removed
+ - prepended_v7_lowercase_words_only: 1 NaNs removed
+ - dropped_v9_minimal_processing: 6 NaNs removed
+ - dropped_v8_keep_hashtags: 1 NaNs removed
+ - kept_v10_lemma_stem_custom_stopwords: 1 NaNs removed
+ - prepended_v1_basic_clean: 1 NaNs removed
+ - prepended_v4_stemmed: 1 NaNs removed
+ - dropped_v5_lemma_stem: 1 NaNs removed
+Traceback (most recent call last):
+  File "/work/projects/hpcadmins/sw-slcolson/NLP_Disaster_Tweets/run_pipeline_ht.py", line 24, in <module>
+    best_models = run_grid_searches(X_train, y_train, pipelines)
+NameError: name 'pipelines' is not defined
+
+real	0m7.899s
+user	0m4.552s
+sys	0m0.893s
+Elapsed time: 7 seconds
