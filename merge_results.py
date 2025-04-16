@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-def merge_all_results(input_dir="performance_metrics3", output_file="performance_metrics3/ALL_results.csv"):
+def merge_all_results(input_dir="performance_metrics4", output_file="performance_metrics4/ALL_results.csv"):
     all_dfs = []
 
     for fname in sorted(os.listdir(input_dir)):
