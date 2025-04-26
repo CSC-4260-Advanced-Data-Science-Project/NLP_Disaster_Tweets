@@ -117,8 +117,10 @@ param_grids = {
     }
 }
 
-def run_grid_searches(X_train, y_train, pipelines):
+def run_grid_searches(X_train, y_train, pipelines, output_dir="performance_metrics4/cv_results"):
     best_models = {}
+    os.makedirs(output_dir, exist_ok=True)
+
     for model_name, pipeline in pipelines.items():
         if model_name not in param_grids:
             print(f"Skipping model: {model_name}")
@@ -139,9 +141,39 @@ def run_grid_searches(X_train, y_train, pipelines):
         best_models[model_name] = grid
 
         print(f"\n✅ Best Params for {model_name}: {grid.best_params_}")
-        print(f"🏆 Best F1 Macro Score: {grid.best_score_:.4f}")
+        print(f"🏆 Best F1 Macro Score (CV): {grid.best_score_:.4f}")
+
+        # 📝 Save full CV results to CSV
+        cv_results_df = pd.DataFrame(grid.cv_results_)
+        cv_results_df.to_csv(os.path.join(output_dir, f"{model_name}_cv_results.csv"), index=False)
 
     return best_models
+
+# def run_grid_searches(X_train, y_train, pipelines):
+#     best_models = {}
+#     for model_name, pipeline in pipelines.items():
+#         if model_name not in param_grids:
+#             print(f"Skipping model: {model_name}")
+#             continue
+
+#         print(f"\n🔍 Tuning hyperparameters for: {model_name}...")
+
+#         grid = GridSearchCV(
+#             pipeline,
+#             param_grid=param_grids[model_name],
+#             cv=5,
+#             scoring='f1_macro',
+#             n_jobs=-1,
+#             verbose=1
+#         )
+
+#         grid.fit(X_train, y_train)
+#         best_models[model_name] = grid
+
+#         print(f"\n✅ Best Params for {model_name}: {grid.best_params_}")
+#         print(f"🏆 Best F1 Macro Score: {grid.best_score_:.4f}")
+
+#     return best_models
 
 # # 🔍 Run just on one dataset and two models
 # xy_datasets = load_xy_datasets("final_processed")
