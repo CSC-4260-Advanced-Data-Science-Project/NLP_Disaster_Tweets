@@ -1,0 +1,22 @@
+Dataset: prepended_v10_lemma_stem_custom_stopwords
+Best Model: PassiveAggressive
+Best Hyperparameters:
+  clf__C: 0.1
+  clf__average: True
+  clf__class_weight: None
+  clf__early_stopping: True
+  clf__fit_intercept: True
+  clf__loss: squared_hinge
+  clf__max_iter: 500
+  clf__n_iter_no_change: 5
+  clf__random_state: 42
+  clf__shuffle: True
+  clf__tol: 1e-05
+  clf__validation_fraction: 0.1
+
+Best Metrics:
+  Accuracy: 0.7873
+  Precision: 0.7626
+  Recall: 0.7243
+  F1 Score: 0.7428
+  ROC AUC: 0.8558

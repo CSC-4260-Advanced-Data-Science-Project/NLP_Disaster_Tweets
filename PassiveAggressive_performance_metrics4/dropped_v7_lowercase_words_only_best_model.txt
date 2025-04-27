@@ -1,0 +1,17 @@
+Dataset: dropped_v7_lowercase_words_only
+Best Model: PassiveAggressive
+Best Hyperparameters:
+  clf__C: 0.01
+  clf__average: False
+  clf__early_stopping: True
+  clf__loss: squared_hinge
+  clf__max_iter: 500
+  clf__tol: 1e-05
+  clf__validation_fraction: 0.1
+
+Best Metrics:
+  Accuracy: 0.7925
+  Precision: 0.7969
+  Recall: 0.6862
+  F1 Score: 0.7372
+  ROC AUC: 0.8601

@@ -1,0 +1,17 @@
+Dataset: dropped_v9_minimal_processing
+Best Model: PassiveAggressive
+Best Hyperparameters:
+  clf__C: 0.01
+  clf__average: False
+  clf__early_stopping: True
+  clf__loss: squared_hinge
+  clf__max_iter: 500
+  clf__tol: 1e-05
+  clf__validation_fraction: 0.1
+
+Best Metrics:
+  Accuracy: 0.7982
+  Precision: 0.8046
+  Recall: 0.6934
+  F1 Score: 0.7446
+  ROC AUC: 0.8528

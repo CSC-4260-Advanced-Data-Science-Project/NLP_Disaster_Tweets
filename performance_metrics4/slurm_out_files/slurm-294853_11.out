@@ -1,0 +1,63 @@
+Processing dataset: kept_v3_lemmatized
+
+📥 Loaded 30 datasets.
+
+⚠️ Datasets with NaNs (before cleaning):
+ - kept_v3_lemmatized: 1 NaNs removed
+ - dropped_v7_lowercase_words_only: 1 NaNs removed
+ - dropped_v4_stemmed: 1 NaNs removed
+ - dropped_v6_custom_stopwords: 5 NaNs removed
+ - prepended_v6_custom_stopwords: 1 NaNs removed
+ - prepended_v5_lemma_stem: 1 NaNs removed
+ - kept_v6_custom_stopwords: 5 NaNs removed
+ - prepended_v9_minimal_processing: 1 NaNs removed
+ - kept_v8_keep_hashtags: 1 NaNs removed
+ - prepended_v8_keep_hashtags: 1 NaNs removed
+ - kept_v7_lowercase_words_only: 1 NaNs removed
+ - kept_v1_basic_clean: 1 NaNs removed
+ - kept_v2_no_emojis_mentions: 1 NaNs removed
+ - prepended_v10_lemma_stem_custom_stopwords: 1 NaNs removed
+ - kept_v5_lemma_stem: 1 NaNs removed
+ - prepended_v3_lemmatized: 1 NaNs removed
+ - dropped_v10_lemma_stem_custom_stopwords: 1 NaNs removed
+ - prepended_v2_no_emojis_mentions: 1 NaNs removed
+ - dropped_v1_basic_clean: 1 NaNs removed
+ - kept_v4_stemmed: 1 NaNs removed
+ - dropped_v3_lemmatized: 1 NaNs removed
+ - dropped_v2_no_emojis_mentions: 1 NaNs removed
+ - kept_v9_minimal_processing: 6 NaNs removed
+ - prepended_v7_lowercase_words_only: 1 NaNs removed
+ - dropped_v9_minimal_processing: 6 NaNs removed
+ - dropped_v8_keep_hashtags: 1 NaNs removed
+ - kept_v10_lemma_stem_custom_stopwords: 1 NaNs removed
+ - prepended_v1_basic_clean: 1 NaNs removed
+ - prepended_v4_stemmed: 1 NaNs removed
+ - dropped_v5_lemma_stem: 1 NaNs removed
+
+🔍 Tuning hyperparameters for: PassiveAggressive...
+Fitting 5 folds for each of 10752 candidates, totalling 53760 fits
+
+✅ Best Params for PassiveAggressive: {'clf__C': 0.1, 'clf__average': False, 'clf__class_weight': 'balanced', 'clf__early_stopping': True, 'clf__fit_intercept': True, 'clf__loss': 'hinge', 'clf__max_iter': 500, 'clf__n_iter_no_change': 5, 'clf__random_state': 42, 'clf__shuffle': True, 'clf__tol': 1e-05, 'clf__validation_fraction': 0.2}
+🏆 Best F1 Macro Score (CV): 0.7903
+
+📊 Evaluation Report for PassiveAggressive
+              precision    recall  f1-score   support
+
+           0       0.82      0.84      0.83       856
+           1       0.78      0.75      0.76       633
+
+    accuracy                           0.80      1489
+   macro avg       0.80      0.79      0.80      1489
+weighted avg       0.80      0.80      0.80      1489
+
+
+📦 Dataset: kept_v3_lemmatized (7443 samples)
+  🔍 Evaluating: PassiveAggressive
+📈 Plotting learning curve for PassiveAggressive on kept_v3_lemmatized...
+
+🏆 Best model summary saved to performance_metrics4/kept_v3_lemmatized_best_model.txt
+
+real	13m36.252s
+user	362m55.775s
+sys	4m31.439s
+Elapsed time: 817 seconds

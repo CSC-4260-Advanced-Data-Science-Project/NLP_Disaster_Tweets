@@ -1,0 +1,13 @@
+Dataset: kept_v2_no_emojis_mentions
+Best Model: PassiveAggressive
+Best Hyperparameters:
+  clf__C: 0.01
+  clf__max_iter: 500
+  clf__tol: 0.001
+
+Best Metrics:
+  Accuracy: 0.7926
+  Precision: 0.7652
+  Recall: 0.7388
+  F1 Score: 0.7517
+  ROC AUC: 0.8586

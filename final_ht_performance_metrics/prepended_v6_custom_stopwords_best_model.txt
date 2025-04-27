@@ -1,0 +1,13 @@
+Dataset: prepended_v6_custom_stopwords
+Best Model: PassiveAggressive
+Best Hyperparameters:
+  clf__C: 0.01
+  clf__max_iter: 500
+  clf__tol: 0.001
+
+Best Metrics:
+  Accuracy: 0.7874
+  Precision: 0.7596
+  Recall: 0.7311
+  F1 Score: 0.7447
+  ROC AUC: 0.8591

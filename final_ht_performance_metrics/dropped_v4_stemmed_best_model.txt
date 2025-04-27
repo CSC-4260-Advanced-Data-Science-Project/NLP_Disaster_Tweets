@@ -1,0 +1,13 @@
+Dataset: dropped_v4_stemmed
+Best Model: SVM
+Best Hyperparameters:
+  clf__C: 1.0
+  clf__gamma: scale
+  clf__kernel: linear
+
+Best Metrics:
+  Accuracy: 0.7945
+  Precision: 0.7844
+  Recall: 0.7116
+  F1 Score: 0.7461
+  ROC AUC: 0.8632
