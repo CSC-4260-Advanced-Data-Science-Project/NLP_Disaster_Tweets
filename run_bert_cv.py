@@ -5,9 +5,14 @@ import pandas as pd
 import numpy as np
 from transformers import BertTokenizer, BertForSequenceClassification, TrainingArguments, Trainer
 from datasets import Dataset
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, train_test_split
 from sklearn import metrics
 import torch
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+# inputs = inputs.to(device)
 
 def run_bert_pipeline(dataset_name):
     print(f"🚀 Starting BERT CV for {dataset_name}...")
@@ -18,6 +23,8 @@ def run_bert_pipeline(dataset_name):
     df.rename(columns={'processed_text': 'text', 'target': 'label'}, inplace=True)
     df = df[["text", "label"]].copy()
     df["text"] = df["text"].astype(str)
+
+    train_df, test_df = train_test_split(df, test_size=0.2, random_state=42, stratify=df["label"])
 
     dataset = Dataset.from_pandas(df)
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
@@ -48,11 +55,13 @@ def run_bert_pipeline(dataset_name):
         train.set_format("torch", columns=["input_ids", "attention_mask", "labels"])
         val.set_format("torch", columns=["input_ids", "attention_mask", "labels"])
 
-        model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
+        model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2).to(device)
+
+        model = model.to(device)
 
         training_args = TrainingArguments(
-            output_dir=f"./results/{dataset_name}/fold{fold}",
-            evaluation_strategy="epoch",
+            output_dir=f"./results/{dataset_name}",
+            eval_strategy="epoch",
             save_strategy="epoch",
             logging_strategy="epoch",
             learning_rate=2e-5,
@@ -77,6 +86,9 @@ def run_bert_pipeline(dataset_name):
 
         # Evaluate on train/val sets
         for split, data in zip(["train", "val"], [train, val]):
+            # model.to(device)
+            # # Move inputs to the same device
+            # inputs = {k: v.to(device) for k, v in inputs.items()}
             output = trainer.predict(data)
             preds = np.argmax(output.predictions, axis=1)
             labels = output.label_ids
@@ -92,7 +104,7 @@ def run_bert_pipeline(dataset_name):
             metrics_summary[split]["rec"].append(rec)
 
     # Save final mean metrics
-    result_path = f"performance_metrics_bert/{dataset_name}_bert_results.csv"
+    result_path = f"performance_metrics_bert_original/{dataset_name}_bert_original_val_results.csv"
     os.makedirs("performance_metrics_bert", exist_ok=True)
     df_out = pd.DataFrame({
         "Split": ["Train", "Validation"],
@@ -103,6 +115,71 @@ def run_bert_pipeline(dataset_name):
     })
     df_out.to_csv(result_path, index=False)
     print(f"✅ Saved results to {result_path}")
+
+    full_train_dataset = Dataset.from_pandas(train_df)
+    full_train_dataset = full_train_dataset.map(tokenize_function, batched=True)
+    full_train_dataset = full_train_dataset.rename_column("label", "labels")
+    full_train_dataset.set_format("torch", columns=["input_ids", "attention_mask", "labels"])
+
+    model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2).to(device)
+
+    # "./results/final_bert_original_{dataset_name}"
+    # "./logs/final_bert_original_{dataset_name}/fold{fold}",
+
+    training_args = TrainingArguments(
+        output_dir=f"./results/final_bert_original_{dataset_name}",
+        learning_rate=2e-5,
+        per_device_train_batch_size=8,
+        num_train_epochs=3,
+        weight_decay=0.01,
+        save_total_limit=1,
+        logging_dir=f"./logs/final_bert_original_{dataset_name}/fold{fold}",
+        report_to="none",  # turn off wandb/logging
+    )
+
+    final_trainer = Trainer(
+        model=model,
+        args=training_args,  # maybe with more epochs if desired
+        train_dataset=full_train_dataset,
+        tokenizer=tokenizer,
+    )
+
+    final_trainer.train()
+
+    test_dataset = Dataset.from_pandas(test_df)
+    test_dataset = test_dataset.map(tokenize_function, batched=True)
+    test_dataset = test_dataset.rename_column("label", "labels")
+    test_dataset.set_format("torch", columns=["input_ids", "attention_mask", "labels"])
+
+    test_output = final_trainer.predict(test_dataset)
+    test_preds = np.argmax(test_output.predictions, axis=1)
+    test_labels = test_output.label_ids
+
+    # Metrics
+    test_acc = metrics.accuracy_score(test_labels, test_preds)
+    test_f1 = metrics.f1_score(test_labels, test_preds)
+    test_prec = metrics.precision_score(test_labels, test_preds)
+    test_rec = metrics.recall_score(test_labels, test_preds)
+
+    print("\n📊 Test Set Performance:")
+    print(f"Accuracy: {test_acc:.4f}")
+    print(f"F1 Score: {test_f1:.4f}")
+    print(f"Precision: {test_prec:.4f}")
+    print(f"Recall: {test_rec:.4f}")
+
+    result_test_path = f"performance_metrics_bert_original/{dataset_name}_bert_original_test_results.csv"
+    df_test_out = pd.DataFrame({
+        "Split": ["Test"],
+        "Accuracy": [test_acc],
+        "F1 Score": [test_f1],
+        "Precision": [test_prec],
+        "Recall": [test_rec],
+    })
+    df_test_out.to_csv(result_test_path, index=False)
+    print(f"✅ Saved results to {result_test_path}")
+
+    final_trainer.save_model(f"./final_model_bert_original_{dataset_name}")
+
 
 if __name__ == "__main__":
     dataset_name = sys.argv[1]
