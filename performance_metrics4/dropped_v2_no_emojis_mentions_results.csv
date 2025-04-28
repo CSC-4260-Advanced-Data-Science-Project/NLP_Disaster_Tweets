@@ -1,2 +1,0 @@
-Dataset,Model,Accuracy,Precision,Recall,F1 Score,ROC AUC
-dropped_v2_no_emojis_mentions,PassiveAggressive,0.7938419802170853,0.8034023140993709,0.6810773220179162,0.7369027320864432,0.8607828957128023
