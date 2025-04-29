@@ -6,6 +6,8 @@
 #SBATCH --time=04:00:00
 #SBATCH --array=0-2
 
+# Author: Caleb Smith
+
 # Load Python + HuggingFace environment
 # . /opt/ohpc/pub/spack/v0.21.1/share/spack/setup-env.sh          # Comment out this line
 spack load py-scikit-learn@1.3.2/ywh  py-torch/oyv py-pandas dos2unix
