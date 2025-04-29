@@ -1,0 +1,13 @@
+Dataset: kept_v1_basic_clean
+Best Model: PassiveAggressive
+Best Hyperparameters:
+  clf__C: 0.01
+  clf__max_iter: 500
+  clf__tol: 0.001
+
+Best Metrics:
+  Accuracy: 0.7906
+  Precision: 0.7623
+  Recall: 0.7373
+  F1 Score: 0.7496
+  ROC AUC: 0.8598
