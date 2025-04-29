@@ -1,3 +1,4 @@
+# Author: Caleb Smith
 # -*- coding: utf-8 -*-
 """bertweet_model.ipynb
 

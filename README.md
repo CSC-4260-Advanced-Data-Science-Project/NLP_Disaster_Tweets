@@ -49,8 +49,11 @@ Sandbox/
 wordclouds/
 .gitignore
 README.md
-OG_README.md
-NLP_DS_Pipeline.ipynb
+NLP_DS_Pipeline.ipynb   # Main Notebook used for analysis and results
+bert_model.ipynb
+bert_model.py
+bertweet_model.ipynb
+bertweet_model.py
 merge_results.py
 pipeline_modules.py
 pipeline_modules_ht.py
@@ -58,6 +61,10 @@ run_pipeline.py
 run_pipeline.sh
 run_pipeline_ht.py
 run_pipeline_ht.sh
+run_bert_cv.py
+run_bert_cv.sh
+run_bertweet_cv.py
+run_bertweet_cv.sh
 dataset_list.txt
 ```
 
@@ -176,7 +183,7 @@ Visual comparisons were created for:
 
 ---
 
-> **Authors**: Sharon Colson, Thomas Robertson, Caleb Smith, Tania Perdomo-Flores  
+> **Authors**: Sharon Colson, Thomas D. Robertson II, Caleb Smith, Tania Perdomo-Flores  
 > **Original Repository**: [GitHub Repo](https://github.com/CSC-4260-Advanced-Data-Science-Project/NLP_Disaster_Tweets)  
 > **Data Source**: [Kaggle - NLP with Disaster Tweets](https://www.kaggle.com/competitions/nlp-getting-started/data)
 
