@@ -54,91 +54,67 @@ def load_xy_datasets(folder_path="final_processed", text_col="processed_text", t
 tfidf = TfidfVectorizer(stop_words='english', max_df=0.8, ngram_range=(1, 3))
 
 pipelines = {
-    # 'MultinomialNB': Pipeline([
-    #     ('tfidf', tfidf),
-    #     ('clf', MultinomialNB())
-    # ]),
-    # 'LogisticRegression': Pipeline([
-    #     ('tfidf', tfidf),
-    #     ('clf', LogisticRegression(max_iter=1000, random_state=42))
-    # ]),
+    'MultinomialNB': Pipeline([
+        ('tfidf', tfidf),
+        ('clf', MultinomialNB())
+    ]),
+    'LogisticRegression': Pipeline([
+        ('tfidf', tfidf),
+        ('clf', LogisticRegression(max_iter=1000, random_state=42))
+    ]),
     'PassiveAggressive': Pipeline([
         ('tfidf', tfidf),
         ('clf', PassiveAggressiveClassifier(max_iter=1000, random_state=42))
     ]),
-#     'SVM': Pipeline([
-#         ('tfidf', tfidf),
-#         ('clf', SVC(kernel='linear', C=1.0, probability=True, random_state=42))
-#     ]),
-#     'KNN': Pipeline([
-#         ('tfidf', tfidf),
-#         ('clf', KNeighborsClassifier(n_neighbors=5))
-#     ]),
-#     'NeuralNetwork': Pipeline([
-#         ('tfidf', tfidf),
-#         ('clf', MLPClassifier(hidden_layer_sizes=(50,), max_iter=300, verbose=True, random_state=42))
-#     ])
+    'SVM': Pipeline([
+        ('tfidf', tfidf),
+        ('clf', SVC(kernel='linear', C=1.0, probability=True, random_state=42))
+    ]),
+    'KNN': Pipeline([
+        ('tfidf', tfidf),
+        ('clf', KNeighborsClassifier(n_neighbors=5))
+    ]),
+    'NeuralNetwork': Pipeline([
+        ('tfidf', tfidf),
+        ('clf', MLPClassifier(hidden_layer_sizes=(50,), max_iter=300, verbose=True, random_state=42))
+    ])
 }
 
 param_grids = {
-    # 'MultinomialNB': {
-    #     'clf__alpha': [0.1, 0.5, 1.0, 1.5, 2.0],
-    # },
-    # 'LogisticRegression': {
-    #     'clf__C': [0.01, 0.1, 1.0, 10.0],
-    #     'clf__penalty': ['l2'],
-    #     'clf__solver': ['lbfgs'],
-    #     'clf__max_iter': [300, 500, 1000]
-    # },
-    # 'PassiveAggressive': {
-    #     'clf__C': [0.01, 0.1, 1.0, 10.0],
-    #     'clf__max_iter': [500, 1000, 2000],
-    #     'clf__tol': [1e-4, 1e-3, 1e-2]
-    # },
-    # 'PassiveAggressive': {
-    # 'clf__C': [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0],  # MUCH wider range
-    # 'clf__max_iter': [500, 1000, 2000, 5000],  # Allow more time to converge
-    # 'clf__tol': [1e-5, 1e-4, 1e-3],  # Allow tighter convergence
-    # 'clf__early_stopping': [True],  # Try to automatically stop if not improving
-    # 'clf__validation_fraction': [0.1, 0.2],  # Fraction of data to validate internally
-    # 'clf__loss': ['hinge', 'squared_hinge'],  # Try both classic SVM-style losses
-    # 'clf__average': [True, False]  # Try model averaging to stabilize online learning
-    # }
+    'MultinomialNB': {
+        'clf__alpha': [0.1, 0.5, 1.0, 1.5, 2.0],
+    },
+    'LogisticRegression': {
+        'clf__C': [0.01, 0.1, 1.0, 10.0],
+        'clf__penalty': ['l2'],
+        'clf__solver': ['lbfgs'],
+        'clf__max_iter': [300, 500, 1000]
+    },
     'PassiveAggressive': {
-    'clf__C': [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0],
-    'clf__max_iter': [500, 1000, 2000, 5000],
-    'clf__tol': [1e-5, 1e-4, 1e-3],
-    'clf__early_stopping': [True],
-    'clf__validation_fraction': [0.1, 0.2],
-    'clf__n_iter_no_change': [5, 10],
-    'clf__loss': ['hinge', 'squared_hinge'],
-    'clf__average': [True, False],
-    'clf__shuffle': [True, False],
-    'clf__fit_intercept': [True, False],
-    'clf__class_weight': [None, 'balanced'],
-    'clf__random_state': [42]  # fix random seed for reproducibility
-}
-
-    # 'SVM': {
-    #     'clf__C': [0.1, 1.0, 10.0],
-    #     'clf__kernel': ['linear', 'rbf'],
-    #     'clf__gamma': ['scale', 'auto']
-    # },
-    # 'KNN': {
-    #     'clf__n_neighbors': [3, 5, 7, 9],
-    #     'clf__weights': ['uniform', 'distance'],
-    #     'clf__metric': ['euclidean', 'manhattan']
-    # },
-    # 'NeuralNetwork': {
-    #     'clf__hidden_layer_sizes': [(50,), (100,), (50, 50), (100, 50)],
-    #     'clf__activation': ['relu', 'tanh'],
-    #     'clf__solver': ['adam', 'sgd'],
-    #     'clf__alpha': [0.0001, 0.001, 0.01],
-    #     'clf__learning_rate': ['constant', 'adaptive'],
-    #     'clf__early_stopping': [True],
-    #     'clf__n_iter_no_change': [5, 10],
-    #     'clf__validation_fraction': [0.1, 0.2]
-    # }
+        'clf__C': [0.01, 0.1, 1.0, 10.0],
+        'clf__max_iter': [500, 1000, 2000],
+        'clf__tol': [1e-4, 1e-3, 1e-2]
+    },
+    'SVM': {
+        'clf__C': [0.1, 1.0, 10.0],
+        'clf__kernel': ['linear', 'rbf'],
+        'clf__gamma': ['scale', 'auto']
+    },
+    'KNN': {
+        'clf__n_neighbors': [3, 5, 7, 9],
+        'clf__weights': ['uniform', 'distance'],
+        'clf__metric': ['euclidean', 'manhattan']
+    },
+    'NeuralNetwork': {
+        'clf__hidden_layer_sizes': [(50,), (100,), (50, 50), (100, 50)],
+        'clf__activation': ['relu', 'tanh'],
+        'clf__solver': ['adam', 'sgd'],
+        'clf__alpha': [0.0001, 0.001, 0.01],
+        'clf__learning_rate': ['constant', 'adaptive'],
+        'clf__early_stopping': [True],
+        'clf__n_iter_no_change': [5, 10],
+        'clf__validation_fraction': [0.1, 0.2]
+    }
 }
 
 def run_grid_searches(X_train, y_train, pipelines, output_dir="performance_metrics4/cv_results"):
@@ -172,52 +148,6 @@ def run_grid_searches(X_train, y_train, pipelines, output_dir="performance_metri
         cv_results_df.to_csv(os.path.join(output_dir, f"{model_name}_cv_results.csv"), index=False)
 
     return best_models
-
-# def run_grid_searches(X_train, y_train, pipelines):
-#     best_models = {}
-#     for model_name, pipeline in pipelines.items():
-#         if model_name not in param_grids:
-#             print(f"Skipping model: {model_name}")
-#             continue
-
-#         print(f"\n🔍 Tuning hyperparameters for: {model_name}...")
-
-#         grid = GridSearchCV(
-#             pipeline,
-#             param_grid=param_grids[model_name],
-#             cv=5,
-#             scoring='f1_macro',
-#             n_jobs=-1,
-#             verbose=1
-#         )
-
-#         grid.fit(X_train, y_train)
-#         best_models[model_name] = grid
-
-#         print(f"\n✅ Best Params for {model_name}: {grid.best_params_}")
-#         print(f"🏆 Best F1 Macro Score: {grid.best_score_:.4f}")
-
-#     return best_models
-
-# # 🔍 Run just on one dataset and two models
-# xy_datasets = load_xy_datasets("final_processed")
-# xy_datasets = {'prepended_v3_lemmatized': xy_datasets['prepended_v3_lemmatized']}  # pick one
-
-# # Select and split dataset for hypertuning
-# X, y = xy_datasets['prepended_v3_lemmatized']
-# X_train, X_test, y_train, y_test = train_test_split(
-#     X, y, test_size=0.2, stratify=y, random_state=42
-# )
-
-# # Run the hypertuning function
-# best_models = run_grid_searches(X_train, y_train, pipelines)
-
-# # Evaluate best models on test set
-# for name, model in best_models.items():
-#     print(f"\n📊 Evaluation Report for {name}")
-#     y_pred = model.predict(X_test)
-#     print(classification_report(y_test, y_pred))
-
 
 def plot_learning_curve(estimator, title, X, y, cv, scoring='accuracy', n_jobs=-1, save_path=None):
     viridis = cm.get_cmap('viridis')
