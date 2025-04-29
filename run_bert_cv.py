@@ -1,4 +1,14 @@
-# run_bert_cv.py
+"""
+File: run_bert_cv.py
+Authors: Caleb Smith and Sharon Colson
+Date Modified: 4/29/25
+Project: NLP With Disaster Tweets
+
+We acknowledge the use of ChatGPT from OpenAI to help create this script:
+'How can I use a BERT model for text classification?' prompt and follow-up prompts. ChatGPT,
+OpenAI, 6 Apr. 2025 and following dates, chatgpt.com
+"""
+
 import sys
 import os
 import pandas as pd
