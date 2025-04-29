@@ -3,7 +3,6 @@
 #SBATCH --partition=batch-impulse
 #SBATCH --cpus-per-task=28
 #SBATCH --mem=16G
-#SBATCH --time=04:00:00
 #SBATCH --array=0-29
 
 # Author: Thomas D. Robertson II

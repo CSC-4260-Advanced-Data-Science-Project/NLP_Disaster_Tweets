@@ -1,0 +1,14 @@
+Dataset: kept_v5_lemma_stem
+Best Model: LogisticRegression
+Best Hyperparameters:
+  clf__C: 10.0
+  clf__max_iter: 300
+  clf__penalty: l2
+  clf__solver: lbfgs
+
+Best Metrics:
+  Accuracy: 0.7936
+  Precision: 0.7816
+  Recall: 0.7139
+  F1 Score: 0.7462
+  ROC AUC: 0.8618

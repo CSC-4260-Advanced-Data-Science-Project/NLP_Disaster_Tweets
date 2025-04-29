@@ -6,6 +6,8 @@
 #SBATCH --time=04:00:00
 #SBATCH --array=0-29
 
+# Author: Sharon Colson
+
 # Load your environment
 . /opt/ohpc/pub/spack/v0.21.1/share/spack/setup-env.sh
 spack load py-matplotlib@3.7 py-scikit-learn@1.3.2  py-seaborn@0.12.2

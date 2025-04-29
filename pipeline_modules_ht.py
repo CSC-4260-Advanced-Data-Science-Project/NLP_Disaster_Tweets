@@ -117,8 +117,10 @@ param_grids = {
     }
 }
 
-def run_grid_searches(X_train, y_train, pipelines):
+def run_grid_searches(X_train, y_train, pipelines, output_dir="performance_metrics4/cv_results"):
     best_models = {}
+    os.makedirs(output_dir, exist_ok=True)
+
     for model_name, pipeline in pipelines.items():
         if model_name not in param_grids:
             print(f"Skipping model: {model_name}")
@@ -139,29 +141,13 @@ def run_grid_searches(X_train, y_train, pipelines):
         best_models[model_name] = grid
 
         print(f"\n✅ Best Params for {model_name}: {grid.best_params_}")
-        print(f"🏆 Best F1 Macro Score: {grid.best_score_:.4f}")
+        print(f"🏆 Best F1 Macro Score (CV): {grid.best_score_:.4f}")
+
+        # 📝 Save full CV results to CSV
+        cv_results_df = pd.DataFrame(grid.cv_results_)
+        cv_results_df.to_csv(os.path.join(output_dir, f"{model_name}_cv_results.csv"), index=False)
 
     return best_models
-
-# # 🔍 Run just on one dataset and two models
-# xy_datasets = load_xy_datasets("final_processed")
-# xy_datasets = {'prepended_v3_lemmatized': xy_datasets['prepended_v3_lemmatized']}  # pick one
-
-# # Select and split dataset for hypertuning
-# X, y = xy_datasets['prepended_v3_lemmatized']
-# X_train, X_test, y_train, y_test = train_test_split(
-#     X, y, test_size=0.2, stratify=y, random_state=42
-# )
-
-# # Run the hypertuning function
-# best_models = run_grid_searches(X_train, y_train, pipelines)
-
-# # Evaluate best models on test set
-# for name, model in best_models.items():
-#     print(f"\n📊 Evaluation Report for {name}")
-#     y_pred = model.predict(X_test)
-#     print(classification_report(y_test, y_pred))
-
 
 def plot_learning_curve(estimator, title, X, y, cv, scoring='accuracy', n_jobs=-1, save_path=None):
     viridis = cm.get_cmap('viridis')

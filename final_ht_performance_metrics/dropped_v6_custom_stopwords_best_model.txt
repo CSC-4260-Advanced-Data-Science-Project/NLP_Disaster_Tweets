@@ -1,0 +1,13 @@
+Dataset: dropped_v6_custom_stopwords
+Best Model: SVM
+Best Hyperparameters:
+  clf__C: 1.0
+  clf__gamma: scale
+  clf__kernel: linear
+
+Best Metrics:
+  Accuracy: 0.7929
+  Precision: 0.7863
+  Recall: 0.7032
+  F1 Score: 0.7421
+  ROC AUC: 0.8544
