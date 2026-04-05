@@ -59,7 +59,7 @@ The central finding: **minimal preprocessing (lowercase-only) consistently outpe
 
 | Field | Value |
 |:------|:------|
-| **Source** | [Kaggle NLP with Disaster Tweets](https://www.kaggle.com/competitions/nlp-getting-started/data) |
+| **Source** | [Kaggle NLP with Disaster Tweets](https://www.kaggle.com/competitions/nlp-getting-started/data) (originally from Figure-Eight's *Data for Everyone* dataset) |
 | **Training set size** | 7,613 tweets |
 | **Test set size** | 3,263 tweets (unlabeled) |
 | **Positive class (disaster)** | ~43% of training set |
@@ -503,39 +503,70 @@ Performance comparisons were made **before and after hyperparameter tuning** to 
 
 ## Results Summary
 
-### Top-Performing Hypertuned Model
+### Baseline Model Performance (Pre-Tuning)
 
-| Metric | Value |
-|:-------|:------|
-| **Model** | Passive Aggressive Classifier |
-| **Dataset** | `kept_v7_lowercase_words_only` |
-| **Accuracy** | 79.26% |
-| **Precision** | 76.50% |
-| **Recall** | 73.92% |
-| **F1 Score** | 75.18% |
-| **ROC AUC** | 85.88% |
+Results from 5-fold cross-validation on the three baseline datasets before any hyperparameter tuning:
 
-### Top 5 Model-Dataset Combinations (Post-Tuning, by F1)
+| Metric | MNB | PA | LR | SVM | KNN | MLP |
+|:-------|----:|---:|---:|----:|----:|----:|
+| **Accuracy** | 0.7969 | 0.7846 | 0.7864 | 0.6110 | 0.6849 | 0.7951 |
+| **Precision** | 0.8607 | 0.7609 | 0.7609 | 1.0000 | 0.8775 | 0.7903 |
+| **Recall** | 0.6304 | 0.7288 | 0.5885 | 0.0964 | 0.3340 | 0.7136 |
+| **F1 Score** | 0.7276 | 0.7443 | 0.7034 | 0.1757 | 0.4458 | 0.7499 |
+| **ROC AUC** | 0.8481 | 0.8399 | 0.8465 | 0.8524 | 0.7383 | 0.8463 |
 
-| Rank | Model | Dataset | F1 Score | Accuracy |
-|:-----|:------|:--------|:---------|:---------|
-| 1 | Passive Aggressive | `kept_v7_lowercase_words_only` | 75.18% | 79.26% |
-| 2 | Passive Aggressive | `dropped_v1_basic_clean` | 74.71% | 78.98% |
-| 3 | Logistic Regression | `kept_v7_lowercase_words_only` | ~74% | ~78% |
-| 4 | SVM | `kept_v7_lowercase_words_only` | ~74% | ~78% |
-| 5 | Passive Aggressive | `kept_v9_minimal_processing` | ~74% | ~78% |
+> **SVM baseline anomaly**: At baseline, SVM achieved precision=1.0 with recall=0.097 — it was classifying nearly everything as non-disaster. This was due to overfitting in the default configuration. Hyperparameter tuning corrected this substantially (see post-tuning results below).
+
+### Post-Tuning Performance (Best Dataset per Model)
+
+After GridSearchCV hyperparameter tuning, best results per model on each model's optimal dataset:
+
+| Model | Best Dataset | Accuracy | Precision | Recall | F1 Score | ROC AUC |
+|:------|:------------|:--------:|:---------:|:------:|:--------:|:-------:|
+| **Passive Aggressive** | `kept_v7_lowercase_words_only` | 79.26% | 76.50% | 73.92% | **75.18%** | 85.88% |
+| Logistic Regression | `kept_v5_lemma_stem` | 79.36% | 78.16% | 71.39% | 74.62% | 86.18% |
+| SVM | `kept_v9_minimal_processing` | 79.65% | 79.13% | 70.82% | 74.74% | 86.13% |
+| MLP | `prepended_v10_lemma_stem_custom_stopwords` | 78.93% | 77.14% | 71.68% | 74.28% | 85.17% |
+| MNB | `prepended_v4_stemmed` | 78.83% | 79.64% | 67.32% | 72.95% | 84.90% |
+| KNN | `dropped_v1_basic_clean` | 76.76% | 79.97% | 60.57% | 68.84% | 81.49% |
+
+### Top 5 Dataset-Model Combinations (Passive Aggressive, by Accuracy)
+
+| Dataset | Model | Accuracy | Precision | Recall | F1 Score | ROC AUC |
+|:--------|:------|:--------:|:---------:|:------:|:--------:|:-------:|
+| `kept_v7_lowercase_words_only` | Passive Aggressive | 0.793 | 0.765 | 0.734 | 0.752 | 0.859 |
+| `kept_v2_no_emojis_mentions` | Passive Aggressive | 0.793 | 0.765 | 0.739 | 0.752 | 0.856 |
+| `kept_v9_minimal_processing` | Passive Aggressive | 0.792 | 0.764 | 0.739 | 0.751 | 0.861 |
+| `kept_v1_basic_clean` | Passive Aggressive | 0.791 | 0.762 | 0.737 | 0.750 | 0.860 |
+| `kept_v6_custom_stopwords` | Passive Aggressive | 0.789 | 0.759 | 0.741 | 0.750 | 0.864 |
+
+### Transformer Model Performance (BERT / BERTweet)
+
+BERT and BERTweet were evaluated on the three top-performing dataset variants (`kept_v7`, `kept_v2`, `kept_v9`) using 5-fold cross-validation and a held-out test set:
+
+| Model | Accuracy | Precision | Recall | F1 Score |
+|:------|:--------:|:---------:|:------:|:--------:|
+| **BERTweet-Base** (best) | **84.08%** | **82.89%** | **78.83%** | **80.81%** |
+| BERT-Base-Uncased | 83.14% | 81.83% | 77.57% | 79.64% |
+| PA Classifier (best classical) | 79.26% | 76.50% | 73.92% | 75.18% |
+
+BERTweet-Base outperformed BERT-Base-Uncased across all metrics, as expected given its pre-training on tweet data. However, the performance advantage over the best classical model is modest: approximately +5% accuracy and +6% F1. Given the significant difference in computational cost, the PA Classifier remains the practical choice for deployment scenarios without GPU infrastructure.
 
 ### Key Findings
 
-1. **Simple preprocessing wins**: `kept_v7_lowercase_only` — retaining all tokens and applying only lowercasing — consistently outperformed variants with stopword removal, stemming, or lemmatization. Aggressive cleaning appears to remove tokens that carry disaster-relevant meaning.
+1. **Preprocessing had a larger impact than hypertuning**: The choice of preprocessing strategy affected performance more than hyperparameter optimization. Simple preprocessing approaches (lowercasing, minimal token filtering) consistently outperformed complex pipelines — likely because over-processing a short text like a tweet removes more signal than noise.
 
-2. **Hyperparameter tuning improved all models**: Post-tuning F1 scores were higher than baseline across every model-dataset combination. The Passive Aggressive Classifier saw the largest gains from regularization (C=0.01 was optimal — much more aggressive regularization than the default).
+2. **Simple preprocessing wins**: `kept_v7_lowercase_words_only` — lowercase only, no stopword removal, no stemming, no lemmatization, keeping all tokens — outperformed variants with aggressive cleaning. The `v7` preprocessing specifically removes numerical digits, punctuation, special characters, emojis, and mentions while retaining all alphabetic word tokens.
 
-3. **PA Classifier is the efficiency winner**: The Passive Aggressive Classifier matched or exceeded Logistic Regression and SVM in F1 while training orders of magnitude faster — making it the practical choice for production or real-time applications.
+3. **Hyperparameter tuning improved all models**: Post-tuning F1 scores were higher than baseline across every model-dataset combination. The PA Classifier benefited most; SVM recovered from a degenerate baseline (F1=0.18 → 0.75) after tuning fixed its default overfitting.
 
-4. **Transformer models are competitive but expensive**: BERT and BERTweet (Caleb Smith's implementation) achieved comparable performance to the best classical models. The marginal performance gain does not justify the infrastructure cost for most deployment scenarios.
+4. **PA Classifier is the efficiency winner**: Highest F1 among classical models, training orders of magnitude faster than SVM or MLP — the practical choice for real-time tweet classification.
 
-5. **`kept` baseline beat `dropped` and `prepended`**: Keeping hashtags and mentions in the token stream outperformed removing them — suggesting these social media features carry real signal, not just noise.
+5. **Transformer models are competitive but expensive**: BERTweet-Base achieved ~5–6% higher accuracy and F1 than the best classical model. The computational cost (GPU required, significantly longer training) may not justify this marginal gain for most deployment scenarios.
+
+6. **`kept` baseline beat `dropped` and `prepended`**: Retaining hashtags and mentions in the token stream outperformed removing them — these social media features carry real discriminative signal, not just noise.
+
+7. **Surprising emoji finding**: EDA revealed that disaster tweets contained *more* emojis than non-disaster tweets — counterintuitive, but interpretable: not all disaster tweeters are in panic, and emojis help convey urgency or emotion when reporting an event.
 
 ---
 
@@ -576,6 +607,7 @@ To regenerate summary visualizations, run the relevant cells in `NLP_DS_Pipeline
 | **Efficient Hypertuning** | Replace GridSearchCV with RandomizedSearchCV or Bayesian optimization (Optuna, Hyperopt) to reduce the combinatorial search cost, especially for MLP |
 | **Larger Transformer Models** | Fine-tune larger models (RoBERTa, DeBERTa, or tweet-specific models) with a proper GPU budget — the current BERT experiments were limited by HPC allocation |
 | **Real-Time Deployment** | Build a streaming inference prototype using the PA Classifier with a lightweight Flask or FastAPI endpoint, consuming live tweets via the Twitter API |
+| **First Responder Notification** | Area-based threshold alerting: when disaster tweet classifications for a given location exceed a threshold, trigger an amber-alert-style notification to first responders — a direct real-world application of this classification pipeline |
 | **Keyword Feature Engineering** | Investigate keyword as a structured feature (categorical encoding or embedding) rather than only as prepended text |
 | **Error Analysis** | Systematic review of misclassified tweets — particularly false positives where metaphorical disaster language ("this traffic is a disaster") fools the classifier |
 
@@ -596,4 +628,6 @@ To regenerate summary visualizations, run the relevant cells in `NLP_DS_Pipeline
 **Original Repository**: [CSC-4260-Advanced-Data-Science-Project/NLP_Disaster_Tweets](https://github.com/CSC-4260-Advanced-Data-Science-Project/NLP_Disaster_Tweets)
 
 **Acknowledgments**  
-The BERT cross-validation implementation (`run_bert_cv.py`) includes structural patterns assisted by OpenAI ChatGPT. The base transformer fine-tuning workflow was adapted from standard Hugging Face `Trainer` API examples.
+- **Tennessee Tech ITS Services and the Warp 1 HPC Facility** (NSF Award #2127188) for computational resources used in model training and hyperparameter tuning
+- **Dr. William Eberle** for guidance throughout CSC-4260
+- The BERT cross-validation implementation (`run_bert_cv.py`) includes structural patterns assisted by OpenAI ChatGPT. The base transformer fine-tuning workflow was adapted from standard Hugging Face `Trainer` API examples.
